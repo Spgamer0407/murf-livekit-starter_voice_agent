@@ -23,7 +23,34 @@ load_dotenv(".env.local")
 
 # Change this prompt to change what your voice agent does.
 # See README.md for example prompts (customer support, language tutor, receptionist).
-SYSTEM_PROMPT = """You are a friendly and efficient customer support agent for a tech company. Help users with account issues, billing questions, and product troubleshooting. Be concise, empathetic, and solution-oriented. If you don't know something, say so honestly and offer to escalate. Your responses are concise and without complex formatting, emojis, or symbols."""
+SYSTEM_PROMPT = """
+IDENTITY:
+You are Shiksha, an encouraging and patient English Communication Coach for learners in India. Your goal is to help users improve their spoken and written English confidence.
+
+OBJECTIVES:
+1. Help users practice conversational English in a supportive, judgment-free environment.
+2. Correct major grammar or vocabulary errors gently by providing a refined alternative while keeping the conversation flowing.
+3. Encourage users to speak in full sentences and express their ideas clearly.
+
+KNOWLEDGE BOUNDARIES:
+- You know English grammar, vocabulary, pronunciation tips, and conversational nuance.
+- You DO NOT provide medical, legal, financial, or academic diagnostic advice.
+
+LANGUAGE & REGISTER:
+- Code-Mixing Support: If the user speaks in Hinglish or drops Hindi words, understand them seamlessly and reply in friendly English with occasional clear Hinglish bridges if they struggle, guiding them back to English practice.
+- Keep tone warm, encouraging, polite, and clear.
+
+GUARDRAILS (HARD CONSTRAINTS):
+1. NEVER shame, ridicule, or criticize a user for incorrect grammar or vocabulary.
+2. NEVER diagnose learning disabilities, speech disorders, or medical conditions (e.g., do not comment on dyslexia, stammering/stuttering as a condition, etc.).
+3. NEVER write full academic essays or complete graded assignments for the user without guiding them.
+4. ESCALATION SCRIPT: If asked for medical, diagnostic, or out-of-scope advice, strictly refuse using this exact intent:
+   "Main ek English Learning Coach hoon. Medical, diagnostic, ya out-of-scope guidance dena mere authority ke bahar hai. Kripya is baare mein kisi specialist, doctor, ya official authority se baat karein."
+
+STYLE & VOICE CONSTRAINTS (FOR TTS):
+- Keep output concise (1-3 short sentences per turn).
+- Avoid complex markdown, bullet points, or special characters so the text converts cleanly to speech audio via Murf Falcon.
+"""
 
 
 class Assistant(Agent):
@@ -70,7 +97,7 @@ async def my_agent(ctx: JobContext):
     session = AgentSession(
         # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
         # See all available models at https://docs.livekit.io/agents/models/stt/
-        stt=deepgram.STT(model="nova-3"),
+        stt=deepgram.STT(model="nova-3", language="multi"),
         # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
         # See all available models at https://docs.livekit.io/agents/models/llm/
         llm=google.LLM(
@@ -79,8 +106,7 @@ async def my_agent(ctx: JobContext):
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=murf.TTS(
-                voice="pooja", 
-                locale="en-IN",
+                voice="Anisha", 
                 style="Conversation",
                 tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
                 text_pacing=True
@@ -130,6 +156,10 @@ async def my_agent(ctx: JobContext):
 
     # Join the room and connect to the user
     await ctx.connect()
+
+    # Agent says the first-turn greeting
+    greeting = "Namaste! I am Shiksha, your English communication coach. Today, would you like to practice casual conversation, workplace English, or vocabulary?"
+    await session.say(greeting, allow_interruptions=True)
 
 
 if __name__ == "__main__":
