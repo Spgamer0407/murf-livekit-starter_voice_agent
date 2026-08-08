@@ -10,7 +10,6 @@ from livekit.agents import (
     JobContext,
     JobProcess,
     cli,
-    inference,
     tokenize,
     room_io,
 )

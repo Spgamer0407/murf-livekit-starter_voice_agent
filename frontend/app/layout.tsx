@@ -1,4 +1,4 @@
-import { Public_Sans } from 'next/font/google';
+import { Lora, Nunito } from 'next/font/google';
 import localFont from 'next/font/local';
 import { headers } from 'next/headers';
 import { ThemeProvider } from '@/components/app/theme-provider';
@@ -7,8 +7,13 @@ import { cn } from '@/lib/shadcn/utils';
 import { getAppConfig, getStyles } from '@/lib/utils';
 import '@/styles/globals.css';
 
-const publicSans = Public_Sans({
-  variable: '--font-public-sans',
+const lora = Lora({
+  variable: '--font-lora',
+  subsets: ['latin'],
+});
+
+const nunito = Nunito({
+  variable: '--font-nunito',
   subsets: ['latin'],
 });
 
@@ -54,7 +59,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       lang="en"
       suppressHydrationWarning
       className={cn(
-        publicSans.variable,
+        lora.variable,
+        nunito.variable,
         commitMono.variable,
         'scroll-smooth font-sans antialiased'
       )}
@@ -71,7 +77,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:flex">
+          <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:hidden">
             <a
               target="_blank"
               rel="noopener noreferrer"
