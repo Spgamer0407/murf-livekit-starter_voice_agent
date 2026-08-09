@@ -1,5 +1,8 @@
 import os
 import logging
+import json
+
+import db
 
 from dotenv import load_dotenv
 from livekit import rtc
@@ -12,6 +15,8 @@ from livekit.agents import (
     cli,
     tokenize,
     room_io,
+    function_tool,
+    RunContext,
 )
 from livekit.plugins import murf, silero, google, deepgram, noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
@@ -31,12 +36,22 @@ OBJECTIVES:
 2. Correct major grammar or vocabulary errors gently by providing a refined alternative while keeping the conversation flowing.
 3. Encourage users to speak in full sentences and express their ideas clearly.
 
+MEMORY & TOOLS:
+- You have memory of past callers. When you meet someone new, ask them for their name. Use `lookup_caller` to see if you have spoken before.
+- ALWAYS use English/Latin script for the `name` argument when calling tools, even if the user speaks in Hindi. (e.g. use "Srinivas" instead of "श्रीनिवास").
+- If you know their name and they have facts saved, greet them warmly by referencing a past topic or mistake they are working on (e.g. "Welcome back Ramesh, last time we practiced workplace English. Shall we continue?").
+- During the call, learn their current English level, topics they want to cover, and common mistakes they make.
+- At the end of the call, or when appropriate, ALWAYS ASK PERMISSION to save these facts. Say: "I would like to remember this for next time. Is that okay?" 
+- If they say yes, use `save_caller_info` to save their level, topics, and mistakes. If they say no, DO NOT SAVE.
+
 KNOWLEDGE BOUNDARIES:
 - You know English grammar, vocabulary, pronunciation tips, and conversational nuance.
 - You DO NOT provide medical, legal, financial, or academic diagnostic advice.
 
-LANGUAGE & REGISTER:
+LANGUAGE & SCRIPT:
 - Code-Mixing Support: If the user speaks in Hinglish or drops Hindi words, understand them seamlessly and reply in friendly English with occasional clear Hinglish bridges if they struggle, guiding them back to English practice.
+- Always write every language in its own native script.
+- Hindi → Devanagari (नमस्ते), never romanized (never "namaste"). Same rule for all non-English languages.
 - Keep tone warm, encouraging, polite, and clear.
 
 GUARDRAILS (HARD CONSTRAINTS):
@@ -56,28 +71,43 @@ class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=SYSTEM_PROMPT)
 
-    # To add tools, use the @function_tool decorator.
-    # Here's an example that adds a simple weather tool.
-    # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
-    # @function_tool
-    # async def lookup_weather(self, context: RunContext, location: str):
-    #     """Use this tool to look up current weather information in the given location.
-    #
-    #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
-    #
-    #     Args:
-    #         location: The location to look up weather information for (e.g. city name)
-    #     """
-    #
-    #     logger.info(f"Looking up weather for {location}")
-    #
-    #     return "sunny with a temperature of 70 degrees."
+    @function_tool
+    async def lookup_caller(self, context: RunContext, name: str):
+        """Use this tool to look up a returning caller's information.
+        
+        Args:
+            name: The name of the user to look up.
+        """
+        logger.info(f"Looking up caller: {name}")
+        info = db.get_user_info(name)
+        if info:
+            return f"Found user {name}. Facts: {json.dumps(info)}"
+        else:
+            return f"User {name} not found. This is a new caller."
+
+    @function_tool
+    async def save_caller_info(self, context: RunContext, name: str, level: str, topics: str, mistakes: str):
+        """Use this tool to save a user's facts to the database ONLY AFTER they have explicitly given you permission.
+        
+        Args:
+            name: The name of the user.
+            level: The user's current English level.
+            topics: The topics covered or that they want to cover.
+            mistakes: Mistakes they keep making.
+        """
+        logger.info(f"Saving info for caller: {name}")
+        success = db.save_user_info(name, level, topics, mistakes)
+        if success:
+            return f"Successfully saved facts for {name}."
+        else:
+            return f"Failed to save facts for {name}."
 
 
 server = AgentServer()
 
 
 def prewarm(proc: JobProcess):
+    db.init_db()
     proc.userdata["vad"] = silero.VAD.load()
 
 
@@ -157,7 +187,7 @@ async def my_agent(ctx: JobContext):
     await ctx.connect()
 
     # Agent says the first-turn greeting
-    greeting = "Namaste! I am Shiksha, your English communication coach. Today, would you like to practice casual conversation, workplace English, or vocabulary?"
+    greeting = "नमस्ते! I am Shiksha, your English communication coach. May I know who I am speaking with today?"
     await session.say(greeting, allow_interruptions=True)
 
 
