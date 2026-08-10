@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+import random
 
 import db
 
@@ -25,6 +26,10 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+# Automated Fail-Safe Toggle for Video Demo
+# This counter will make every 2nd call to fetch_exercise fail automatically
+fetch_call_count = 0
+
 # Change this prompt to change what your voice agent does.
 # See README.md for example prompts (customer support, language tutor, receptionist).
 SYSTEM_PROMPT = """
@@ -43,6 +48,7 @@ MEMORY & TOOLS:
 - During the call, learn their current English level, topics they want to cover, and common mistakes they make.
 - At the end of the call, or when appropriate, ALWAYS ASK PERMISSION to save these facts. Say: "I would like to remember this for next time. Is that okay?" 
 - If they say yes, use `save_caller_info` to save their level, topics, and mistakes. If they say no, DO NOT SAVE.
+- When the user asks for a practice exercise, a new word, or when you want to test their skills, use `get_vocabulary_exercise` with their level ("beginner", "intermediate", or "advanced") to get a new word. After providing the exercise, ask them to make a sentence with it.
 
 KNOWLEDGE BOUNDARIES:
 - You know English grammar, vocabulary, pronunciation tips, and conversational nuance.
@@ -101,6 +107,44 @@ class Assistant(Agent):
             return f"Successfully saved facts for {name}."
         else:
             return f"Failed to save facts for {name}."
+
+    @function_tool
+    async def get_vocabulary_exercise(self, context: RunContext, level: str):
+        """Fetch a vocabulary exercise by level from the local curriculum database.
+        
+        Args:
+            level: The user's English level (must be "beginner", "intermediate", or "advanced").
+        """
+        global fetch_call_count
+        fetch_call_count += 1
+        
+        logger.info(f"Fetching exercise for level: {level} (Call count: {fetch_call_count})")
+        try:
+            # Force failure on every 2nd request for the video demo
+            if fetch_call_count % 2 == 0:
+                raise ConnectionError("Database unreachable")
+
+            # Simulate a real API call or database fetch using our local dataset
+            file_path = os.path.join(os.path.dirname(__file__), "exercises.json")
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            exercises = data.get("exercises", {})
+            
+            level_key = level.lower()
+            if level_key not in exercises:
+                level_key = "beginner"
+                
+            options = exercises[level_key]
+            exercise = random.choice(options)
+            
+            return (
+                f"Fetched from the August 2026 local curriculum database for {level} level: "
+                f"Word: '{exercise['word']}', Meaning: '{exercise['meaning']}'."
+            )
+        except Exception as e:
+            logger.error(f"Failed to fetch exercise: {e}")
+            return "ERROR: The local exercise database is currently offline."
 
 
 server = AgentServer()

@@ -1,0 +1,59 @@
+{
+    "metadata": {
+        "last_updated": "August 2026",
+        "source": "Local Shiksha Curriculum"
+    },
+    "exercises": {
+        "beginner": [
+            {
+                "word": "Apple",
+                "meaning": "A round fruit with red or green skin.",
+                "example": "I eat an apple every day."
+            },
+            {
+                "word": "Happy",
+                "meaning": "Feeling or showing pleasure.",
+                "example": "She is very happy today."
+            },
+            {
+                "word": "Brave",
+                "meaning": "Ready to face and endure danger or pain.",
+                "example": "The brave firefighter saved the cat."
+            }
+        ],
+        "intermediate": [
+            {
+                "word": "Gratitude",
+                "meaning": "The quality of being thankful.",
+                "example": "He expressed his gratitude for the help."
+            },
+            {
+                "word": "Efficient",
+                "meaning": "Achieving maximum productivity with minimum wasted effort.",
+                "example": "The new engine is very efficient."
+            },
+            {
+                "word": "Analyze",
+                "meaning": "Examine in detail to discover meaning.",
+                "example": "We need to analyze the data carefully."
+            }
+        ],
+        "advanced": [
+            {
+                "word": "Ubiquitous",
+                "meaning": "Present, appearing, or found everywhere.",
+                "example": "Mobile phones have become ubiquitous in modern society."
+            },
+            {
+                "word": "Ephemeral",
+                "meaning": "Lasting for a very short time.",
+                "example": "Fashions are ephemeral and change quickly."
+            },
+            {
+                "word": "Eloquent",
+                "meaning": "Fluent or persuasive in speaking or writing.",
+                "example": "She gave an eloquent speech at the ceremony."
+            }
+        ]
+    }
+}

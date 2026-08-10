@@ -16,6 +16,12 @@ Build a production voice AI agent in 5 minutes. Powered by the fastest TTS on th
 
 ---
 
+## Data Source (Day 5)
+
+The `get_vocabulary_exercise` tool in this project uses a hand-built local dataset (`backend/src/exercises.json`) containing English vocabulary words and example sentences categorized by difficulty level (beginner, intermediate, advanced). This allows the agent to fetch a "fresh" exercise whenever the user requests practice, fulfilling the real domain data requirement.
+
+---
+
 ## Architecture
 
 ```mermaid
