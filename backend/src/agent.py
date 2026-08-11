@@ -231,7 +231,11 @@ async def my_agent(ctx: JobContext):
     await ctx.connect()
 
     # Agent says the first-turn greeting
-    greeting = "नमस्ते! I am Shiksha, your English communication coach. May I know who I am speaking with today?"
+    if ctx.room.name.startswith("outbound"):
+        greeting = "Hello! This is Shiksha, your English communication coach. I am calling to practice conversational English with you today. If you'd like to end this call at any time, just say 'stop' or hang up."
+    else:
+        greeting = "नमस्ते! I am Shiksha, your English communication coach. May I know who I am speaking with today?"
+        
     await session.say(greeting, allow_interruptions=True)
 
 
