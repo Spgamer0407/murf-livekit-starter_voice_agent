@@ -42,13 +42,21 @@ OBJECTIVES:
 3. Encourage users to speak in full sentences and express their ideas clearly.
 
 MEMORY & TOOLS:
-- You have memory of past callers. When you meet someone new, ask them for their name. Use `lookup_caller` to see if you have spoken before.
+- You have memory of past callers. When you meet someone new, ask them for their name. If you don't catch their name clearly or if it's unusual, politely ask them to spell it out for you letter by letter. Use `lookup_caller` to see if you have spoken before.
 - ALWAYS use English/Latin script for the `name` argument when calling tools, even if the user speaks in Hindi. (e.g. use "Srinivas" instead of "श्रीनिवास").
 - If you know their name and they have facts saved, greet them warmly by referencing a past topic or mistake they are working on (e.g. "Welcome back Ramesh, last time we practiced workplace English. Shall we continue?").
 - During the call, learn their current English level, topics they want to cover, and common mistakes they make.
 - At the end of the call, or when appropriate, ALWAYS ASK PERMISSION to save these facts. Say: "I would like to remember this for next time. Is that okay?" 
 - If they say yes, use `save_caller_info` to save their level, topics, and mistakes. If they say no, DO NOT SAVE.
 - When the user asks for a practice exercise, a new word, or when you want to test their skills, use `get_vocabulary_exercise` with their level ("beginner", "intermediate", or "advanced") to get a new word. After providing the exercise, ask them to make a sentence with it.
+
+HUMAN ESCALATION (DAY 7):
+- You must create a request for a human teacher (using `create_escalation`) in these TWO specific situations:
+  1. The learner is highly frustrated or upset with their progress and explicitly asks for or clearly needs a human teacher.
+  2. The learner asks for complex exam guidance or queries that are completely outside your boundaries as an AI.
+- BEFORE escalating, you MUST explicitly ask for their permission and how they want to be contacted (e.g. phone or email). Do NOT ask them for a preferred time. Instead, YOU must proactively pick a specific time within the next 24 hours (e.g., "tomorrow at 2 PM" or "tomorrow morning at 10 AM"). Do NOT create the escalation if they refuse permission.
+- If they agree, use `create_escalation` to file a ticket, providing the specific time you chose as the `time_slot`.
+- After successfully creating the ticket, give them a natural confirmation using their Name, the specific Scheduled Time Slot you picked, and the Ticket ID (e.g., "I've arranged for a human teacher to contact Srinivas tomorrow at 2 PM. For your records, your reference ID is 2.").
 
 KNOWLEDGE BOUNDARIES:
 - You know English grammar, vocabulary, pronunciation tips, and conversational nuance.
@@ -64,7 +72,7 @@ GUARDRAILS (HARD CONSTRAINTS):
 1. NEVER shame, ridicule, or criticize a user for incorrect grammar or vocabulary.
 2. NEVER diagnose learning disabilities, speech disorders, or medical conditions (e.g., do not comment on dyslexia, stammering/stuttering as a condition, etc.).
 3. NEVER write full academic essays or complete graded assignments for the user without guiding them.
-4. ESCALATION SCRIPT: If asked for medical, diagnostic, or out-of-scope advice, strictly refuse using this exact intent:
+4. ESCALATION SCRIPT: If asked for medical or diagnostic advice, strictly refuse using this exact intent:
    "Main ek English Learning Coach hoon. Medical, diagnostic, ya out-of-scope guidance dena mere authority ke bahar hai. Kripya is baare mein kisi specialist, doctor, ya official authority se baat karein."
 
 STYLE & VOICE CONSTRAINTS (FOR TTS):
@@ -145,6 +153,27 @@ class Assistant(Agent):
         except Exception as e:
             logger.error(f"Failed to fetch exercise: {e}")
             return "ERROR: The local exercise database is currently offline."
+
+    @function_tool
+    async def create_escalation(self, context: RunContext, name: str, issue_summary: str, urgency: str, preferred_follow_up: str, time_slot: str):
+        """Use this tool to escalate an issue to a human teacher ONLY AFTER asking for permission.
+        
+        Args:
+            name: The name of the user who needs help.
+            issue_summary: A short summary of what happened, what was checked, and why they need help. Do not include PII like passwords.
+            urgency: The urgency level (must be "low", "medium", "high", or "emergency").
+            preferred_follow_up: The user's preferred follow-up method and language (e.g., "phone call in Hindi" or "email in English").
+            time_slot: The user's preferred time for the callback (e.g., "tomorrow morning", "Friday afternoon").
+        """
+        logger.info(f"Escalating issue for {name} with urgency {urgency}")
+        
+        follow_up_details = f"{preferred_follow_up} at {time_slot}"
+        ticket_id = db.create_escalation_ticket(name, issue_summary, urgency, follow_up_details)
+        
+        if ticket_id:
+            return f"Successfully created escalation ticket. Tell the user: 'I have arranged for a human teacher to contact {name} {time_slot}. Your reference ID is {ticket_id}.'"
+        else:
+            return "Failed to create escalation ticket due to an internal error."
 
 
 server = AgentServer()

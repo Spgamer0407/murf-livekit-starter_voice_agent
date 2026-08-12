@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useSessionContext, useAgent, useTrackToggle } from '@livekit/components-react';
 import { Button } from '@/components/ui/button';
 import { ShikshaVisualizer } from './shiksha-visualizer';
+
 import {
   Mic,
   MicOff,
@@ -17,6 +18,7 @@ import {
   Clock,
   RotateCcw,
   Target,
+  FileText,
 } from 'lucide-react';
 
 interface ShikshaViewProps {
@@ -33,6 +35,7 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
   const [sessionSeconds, setSessionSeconds] = useState(0);
   const [hasHadSession, setHasHadSession] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
+
 
   // Check microphone permissions on mount
   useEffect(() => {
@@ -132,9 +135,11 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
           </div>
         </div>
 
-        {/* Session timer (visible during call) */}
-        <AnimatePresence>
-          {isConnected && (
+        <div className="flex items-center gap-4">
+
+          {/* Session timer (visible during call) */}
+          <AnimatePresence>
+            {isConnected && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -149,7 +154,8 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
               </span>
             </motion.div>
           )}
-        </AnimatePresence>
+          </AnimatePresence>
+        </div>
       </motion.header>
 
       {/* ─── MICROPHONE ERROR BANNER ─── */}
@@ -501,6 +507,8 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
       <footer className="relative z-10 flex items-center justify-center border-t border-stone-200 bg-[#FDFBF7] py-4 font-sans text-xs font-semibold text-stone-500 dark:border-stone-800 dark:bg-[#1C1917] dark:text-stone-500">
         Powered by Murf AI &middot; LiveKit Agents
       </footer>
+
+
     </div>
   );
 }

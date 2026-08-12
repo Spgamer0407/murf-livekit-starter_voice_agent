@@ -20,6 +20,17 @@ def init_db():
             last_interaction TIMESTAMP
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS escalations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            summary TEXT,
+            urgency TEXT,
+            follow_up TEXT,
+            status TEXT,
+            created_at TIMESTAMP
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -64,3 +75,20 @@ def save_user_info(name: str, level: str, topics: str, mistakes: str):
     except Exception as e:
         logger.error(f"Error saving user {name}: {e}")
         return False
+
+def create_escalation_ticket(name: str, summary: str, urgency: str, follow_up: str):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        now = datetime.now().isoformat()
+        cursor.execute("""
+            INSERT INTO escalations (name, summary, urgency, follow_up, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, summary, urgency, follow_up, "open", now))
+        conn.commit()
+        ticket_id = cursor.lastrowid
+        conn.close()
+        return ticket_id
+    except Exception as e:
+        logger.error(f"Error creating escalation ticket for {name}: {e}")
+        return None
