@@ -49,6 +49,7 @@ MEMORY & TOOLS:
 - At the end of the call, or when appropriate, ALWAYS ASK PERMISSION to save these facts. Say: "I would like to remember this for next time. Is that okay?" 
 - If they say yes, use `save_caller_info` to save their level, topics, and mistakes. If they say no, DO NOT SAVE.
 - When the user asks for a practice exercise, a new word, or when you want to test their skills, use `get_vocabulary_exercise` with their level ("beginner", "intermediate", or "advanced") to get a new word. After providing the exercise, ask them to make a sentence with it.
+- When the user successfully completes a vocabulary exercise by using the word in a sentence correctly, ALWAYS call the `mark_exercise_completed` tool to track their success.
 
 HUMAN ESCALATION (DAY 7):
 - You must create a request for a human teacher (using `create_escalation`) in these TWO specific situations:
@@ -84,6 +85,14 @@ STYLE & VOICE CONSTRAINTS (FOR TTS):
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=SYSTEM_PROMPT)
+        self.call_successful = False
+
+    @function_tool
+    async def mark_exercise_completed(self, context: RunContext):
+        """Use this tool when the learner has successfully completed an exercise by making a sentence with the new word."""
+        logger.info("Marking exercise as completed.")
+        self.call_successful = True
+        return "Noted that the exercise was completed."
 
     @function_tool
     async def lookup_caller(self, context: RunContext, name: str):
@@ -241,8 +250,9 @@ async def my_agent(ctx: JobContext):
     # await avatar.start(session, room=ctx.room)
 
     # Start the session, which initializes the voice pipeline and warms up the models
+    assistant = Assistant()
     await session.start(
-        agent=Assistant(),
+        agent=assistant,
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
@@ -255,6 +265,12 @@ async def my_agent(ctx: JobContext):
             ),
         ),
     )
+    
+    @ctx.room.on("disconnected")
+    def on_disconnected():
+        status = "successful" if assistant.call_successful else "failed"
+        logger.info(f"Call disconnected. Outcome: {status}")
+        db.record_call_outcome(status)
 
     # Join the room and connect to the user
     await ctx.connect()

@@ -31,6 +31,13 @@ def init_db():
             created_at TIMESTAMP
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS calls (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            status TEXT,
+            created_at TIMESTAMP
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -92,3 +99,19 @@ def create_escalation_ticket(name: str, summary: str, urgency: str, follow_up: s
     except Exception as e:
         logger.error(f"Error creating escalation ticket for {name}: {e}")
         return None
+
+def record_call_outcome(status: str):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        now = datetime.now().isoformat()
+        cursor.execute("""
+            INSERT INTO calls (status, created_at)
+            VALUES (?, ?)
+        """, (status, now))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        logger.error(f"Error recording call outcome: {e}")
+        return False

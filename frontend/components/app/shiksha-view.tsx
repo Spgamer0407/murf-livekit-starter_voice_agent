@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ConnectionState, Track } from 'livekit-client';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSessionContext, useAgent, useTrackToggle } from '@livekit/components-react';
@@ -19,6 +20,7 @@ import {
   RotateCcw,
   Target,
   FileText,
+  Activity,
 } from 'lucide-react';
 
 interface ShikshaViewProps {
@@ -136,6 +138,18 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
         </div>
 
         <div className="flex items-center gap-4">
+          {isReady && (
+            <a href="/dashboard">
+              <Button
+                variant="outline"
+                size="sm"
+                className="group hidden md:flex items-center gap-2 rounded-lg border-stone-200 font-sans font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-900 dark:border-stone-800 dark:text-stone-300 dark:hover:bg-stone-800"
+              >
+                <Activity className="size-4 text-blue-600 dark:text-blue-400 group-hover:animate-pulse" />
+                View Dashboard
+              </Button>
+            </a>
+          )}
 
           {/* Session timer (visible during call) */}
           <AnimatePresence>
