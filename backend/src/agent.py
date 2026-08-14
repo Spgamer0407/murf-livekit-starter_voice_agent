@@ -50,6 +50,7 @@ MEMORY & TOOLS:
 - If they say yes, use `save_caller_info` to save their level, topics, and mistakes. If they say no, DO NOT SAVE.
 - When the user asks for a practice exercise, a new word, or when you want to test their skills, use `get_vocabulary_exercise` with their level ("beginner", "intermediate", or "advanced") to get a new word. After providing the exercise, ask them to make a sentence with it.
 - When the user successfully completes a vocabulary exercise by using the word in a sentence correctly, ALWAYS call the `mark_exercise_completed` tool to track their success.
+- **GRAMMAR HANDOFF**: If the user asks a complex grammar question, asks about grammar rules (e.g., tenses, conditionals), or needs deep explanation of sentence structures, you MUST use the `transfer_to_specialist` tool to hand the call over to the Grammar Specialist (Arjun). Do NOT answer complex grammar questions yourself.
 
 HUMAN ESCALATION (DAY 7):
 - You must create a request for a human teacher (using `create_escalation`) in these TWO specific situations:
@@ -80,6 +81,24 @@ STYLE & VOICE CONSTRAINTS (FOR TTS):
 - Keep output concise (1-3 short sentences per turn).
 - Avoid complex markdown, bullet points, or special characters so the text converts cleanly to speech audio via Murf Falcon.
 """
+
+
+class GrammarSpecialist(Agent):
+    def __init__(self, chat_ctx) -> None:
+        super().__init__(
+            instructions="""IDENTITY:
+You are Arjun, a Grammar Specialist, an expert at explaining complex English grammar rules.
+Your job is to take over the conversation when the user has deep or complicated questions about grammar.
+IMPORTANT: The very first thing you say when you enter the conversation MUST be an introduction (e.g., "Hello, I am Arjun, the Grammar Specialist."). After introducing yourself, proceed to answer the user's question clearly and briefly. Provide examples when helpful.
+""",
+            chat_ctx=chat_ctx,
+            tts=murf.TTS(
+                voice="Karan", 
+                style="Conversation",
+                tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
+                text_pacing=True
+            )
+        )
 
 
 class Assistant(Agent):
@@ -183,6 +202,12 @@ class Assistant(Agent):
             return f"Successfully created escalation ticket. Tell the user: 'I have arranged for a human teacher to contact {name} {time_slot}. Your reference ID is {ticket_id}.'"
         else:
             return "Failed to create escalation ticket due to an internal error."
+
+    @function_tool
+    async def transfer_to_specialist(self, context: RunContext):
+        """Use this tool when the user's request needs a specialist, such as complex grammar questions."""
+        logger.info("Transferring to Grammar Specialist (Arjun).")
+        return GrammarSpecialist(chat_ctx=self.chat_ctx), "I would like to hand over this question to a grammar specialist."
 
 
 server = AgentServer()
