@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MessageSquare, Mic } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLiveTranscript } from '@/hooks/useLiveTranscript';
