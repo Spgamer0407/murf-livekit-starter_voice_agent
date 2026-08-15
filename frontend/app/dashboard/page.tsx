@@ -26,7 +26,7 @@ async function getCallStats() {
       } else {
         let successful = 0;
         let failed = 0;
-        rows.forEach((row: { status: string; count: number }) => {
+        (rows as { status: string; count: number }[]).forEach((row) => {
           if (row.status === 'successful') successful = row.count;
           if (row.status === 'failed') failed = row.count;
         });
