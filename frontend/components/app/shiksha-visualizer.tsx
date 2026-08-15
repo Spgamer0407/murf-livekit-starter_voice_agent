@@ -23,9 +23,9 @@ export function ShikshaVisualizer() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex h-full w-full min-h-0 flex-col items-center justify-center"
+        className="flex h-full min-h-0 w-full flex-col items-center justify-center"
       >
-        <div className="relative flex w-full flex-1 min-h-0 items-center justify-center">
+        <div className="relative flex min-h-0 w-full flex-1 items-center justify-center">
           <AgentAudioVisualizerWave
             size="lg"
             state="speaking"
@@ -33,7 +33,7 @@ export function ShikshaVisualizer() {
             colorShift={0.1}
             lineWidth={3}
             audioTrack={agentAudioTrack}
-            className="relative z-10 h-full w-full max-h-[140px] max-w-[140px]"
+            className="relative z-10 h-full max-h-[140px] w-full max-w-[140px]"
           />
         </div>
         <div className="mt-3 flex shrink-0 items-center gap-2">
@@ -60,16 +60,16 @@ export function ShikshaVisualizer() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex h-full w-full min-h-0 flex-col items-center justify-center"
+      className="flex h-full min-h-0 w-full flex-col items-center justify-center"
     >
-      <div className="relative flex w-full flex-1 min-h-0 items-center justify-center">
+      <div className="relative flex min-h-0 w-full flex-1 items-center justify-center">
         <AgentAudioVisualizerBar
           size="md"
           state="speaking"
           color="#059669" // emerald-600
           barCount={7}
           audioTrack={micTrackRef}
-          className="relative z-10 h-full w-full max-h-[140px] max-w-[140px]"
+          className="relative z-10 h-full max-h-[140px] w-full max-w-[140px]"
         />
       </div>
       <div className="mt-3 flex shrink-0 items-center gap-2">

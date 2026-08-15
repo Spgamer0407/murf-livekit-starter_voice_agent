@@ -119,7 +119,7 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
         )}
       </AnimatePresence>
 
-      <main className="relative z-10 flex flex-1 min-h-0 items-center justify-center p-4 md:p-8">
+      <main className="relative z-10 flex min-h-0 flex-1 items-center justify-center p-4 md:p-8">
         <AnimatePresence mode="wait">
           {/* STATE 1: READY */}
           {isReady && (
@@ -211,7 +211,7 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
               className="grid h-full min-h-0 w-full max-w-7xl grid-cols-1 gap-6 pb-4 lg:grid-cols-2 lg:gap-8"
             >
               {/* Left Column */}
-              <div className="glass-panel relative flex flex-col items-center min-h-0 rounded-3xl p-6 lg:p-8">
+              <div className="glass-panel relative flex min-h-0 flex-col items-center rounded-3xl p-6 lg:p-8">
                 <div className="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-stone-100/50 px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md dark:bg-stone-900/50">
                   <Clock className="size-4 text-teal-600 dark:text-teal-400" />
                   <span className="text-stone-700 dark:text-stone-200">
@@ -230,7 +230,7 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
                     animate={{ scale: agentState === 'speaking' ? [1, 1.05, 1] : 1 }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   />
-                  <div className="relative flex size-32 md:size-40 items-center justify-center overflow-hidden rounded-full border-4 border-white/50 bg-stone-100 shadow-xl dark:border-stone-800/50 dark:bg-stone-900">
+                  <div className="relative flex size-32 items-center justify-center overflow-hidden rounded-full border-4 border-white/50 bg-stone-100 shadow-xl md:size-40 dark:border-stone-800/50 dark:bg-stone-900">
                     <Image
                       src="/images/human-avatar.png"
                       alt="Coach Avatar"
@@ -262,7 +262,7 @@ export function ShikshaView({ startButtonText, onStartCall }: ShikshaViewProps) 
                   )}
                 </motion.div>
 
-                <div className="mb-6 flex w-full shrink min-h-0 items-center justify-center rounded-2xl bg-stone-50/50 p-4 shadow-inner ring-1 ring-stone-900/5 dark:bg-stone-950/50 dark:ring-white/5">
+                <div className="mb-6 flex min-h-0 w-full shrink items-center justify-center rounded-2xl bg-stone-50/50 p-4 shadow-inner ring-1 ring-stone-900/5 dark:bg-stone-950/50 dark:ring-white/5">
                   <ShikshaVisualizer />
                 </div>
 

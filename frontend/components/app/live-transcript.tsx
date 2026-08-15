@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+import { useEffect, useRef } from 'react';
 import { MessageSquare, Mic } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef } from 'react';
 import { useLiveTranscript } from '@/hooks/useLiveTranscript';
 
 export function LiveTranscript() {
@@ -25,10 +25,7 @@ export function LiveTranscript() {
         </h3>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="transcript-scroll flex-1 overflow-y-auto p-6"
-      >
+      <div ref={scrollRef} className="transcript-scroll flex-1 overflow-y-auto p-6">
         <div className="flex flex-col gap-6 pb-4">
           <AnimatePresence initial={false}>
             {messages.length === 0 ? (
