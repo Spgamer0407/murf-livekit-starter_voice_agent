@@ -41,7 +41,7 @@ export function App({ appConfig }: AppProps) {
   return (
     <AgentSessionProvider session={session}>
       <AppSetup />
-      <main className="h-svh">
+      <main className="flex flex-col h-[calc(100svh-5rem)] overflow-hidden">
         <ViewController appConfig={appConfig} />
       </main>
       <StartAudioButton label="Start Audio" />

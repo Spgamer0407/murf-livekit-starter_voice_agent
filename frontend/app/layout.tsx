@@ -1,19 +1,21 @@
-import { Lora, Nunito } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import localFont from 'next/font/local';
 import { headers } from 'next/headers';
+import Link from 'next/link';
+import { LayoutDashboard, MessageCircle } from 'lucide-react';
 import { ThemeProvider } from '@/components/app/theme-provider';
 import { ThemeToggle } from '@/components/app/theme-toggle';
 import { cn } from '@/lib/shadcn/utils';
 import { getAppConfig, getStyles } from '@/lib/utils';
 import '@/styles/globals.css';
 
-const lora = Lora({
-  variable: '--font-lora',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 });
 
-const nunito = Nunito({
-  variable: '--font-nunito',
+const outfit = Outfit({
+  variable: '--font-outfit',
   subsets: ['latin'],
 });
 
@@ -59,8 +61,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       lang="en"
       suppressHydrationWarning
       className={cn(
-        lora.variable,
-        nunito.variable,
+        inter.variable,
+        outfit.variable,
         commitMono.variable,
         'scroll-smooth font-sans antialiased'
       )}
@@ -70,46 +72,46 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
       </head>
-      <body className="overflow-x-hidden">
+      <body className="bg-mesh min-h-screen overflow-x-hidden">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:hidden">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://livekit.io"
-              className="scale-100 transition-transform duration-300 hover:scale-110"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logo} alt={`${companyName} Logo`} className="block size-6 dark:hidden" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={logoDark ?? logo}
-                alt={`${companyName} Logo`}
-                className="hidden size-6 dark:block"
-              />
-            </a>
-            <span className="text-foreground font-mono text-xs font-bold tracking-wider uppercase">
-              Built with{' '}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://docs.livekit.io/agents"
-                className="underline underline-offset-4"
+          <header className="fixed top-0 left-0 z-50 flex w-full flex-row items-center justify-between border-b border-white/20 bg-white/40 p-4 px-6 shadow-sm backdrop-blur-xl transition-all dark:border-stone-800/50 dark:bg-stone-950/40">
+            <Link href="/" className="group flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 shadow-md shadow-teal-600/20 transition-transform group-hover:scale-105">
+                <span className="font-serif text-xl font-bold text-white">S</span>
+              </div>
+              <span className="font-sans text-lg font-bold tracking-tight text-stone-800 dark:text-stone-100">
+                Shiksha AI
+              </span>
+            </Link>
+
+            <nav className="flex items-center gap-1 rounded-full border border-stone-200/50 bg-white/50 p-1.5 shadow-sm backdrop-blur-md dark:border-stone-700/50 dark:bg-stone-800/50">
+              <Link
+                href="/"
+                className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-bold text-stone-600 transition-all hover:bg-white hover:text-teal-600 hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-teal-400"
               >
-                LiveKit Agents
-              </a>
-            </span>
+                <MessageCircle className="size-4" />
+                <span className="hidden sm:inline">Agent</span>
+              </Link>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-bold text-stone-600 transition-all hover:bg-white hover:text-teal-600 hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-teal-400"
+              >
+                <LayoutDashboard className="size-4" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Link>
+            </nav>
+
+            <div className="flex items-center">
+              <ThemeToggle className="scale-90" />
+            </div>
           </header>
 
-          {children}
-          <div className="group fixed bottom-0 left-1/2 z-50 mb-2 -translate-x-1/2">
-            <ThemeToggle className="translate-y-20 transition-transform delay-150 duration-300 group-hover:translate-y-0" />
-          </div>
+          <div className="pt-20">{children}</div>
         </ThemeProvider>
       </body>
     </html>

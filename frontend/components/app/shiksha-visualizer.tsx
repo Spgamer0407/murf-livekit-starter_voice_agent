@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { useVoiceAssistant, useSessionContext } from '@livekit/components-react';
-import { AgentAudioVisualizerWave } from '@/components/agents-ui/agent-audio-visualizer-wave';
+import { useSessionContext, useVoiceAssistant } from '@livekit/components-react';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
+import { AgentAudioVisualizerWave } from '@/components/agents-ui/agent-audio-visualizer-wave';
 
 export function ShikshaVisualizer() {
   const { state: agentState, audioTrack: agentAudioTrack } = useVoiceAssistant();
@@ -23,9 +23,9 @@ export function ShikshaVisualizer() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex flex-col items-center justify-center"
+        className="flex h-full w-full min-h-0 flex-col items-center justify-center"
       >
-        <div className="relative">
+        <div className="relative flex w-full flex-1 min-h-0 items-center justify-center">
           <AgentAudioVisualizerWave
             size="lg"
             state="speaking"
@@ -33,10 +33,10 @@ export function ShikshaVisualizer() {
             colorShift={0.1}
             lineWidth={3}
             audioTrack={agentAudioTrack}
-            className="relative z-10 size-[200px] md:size-[280px]"
+            className="relative z-10 h-full w-full max-h-[140px] max-w-[140px]"
           />
         </div>
-        <div className="mt-6 flex items-center gap-2">
+        <div className="mt-3 flex shrink-0 items-center gap-2">
           {/* Animated speaking indicator dots */}
           <div className="flex items-center gap-1.5">
             {[0, 0.15, 0.3].map((delay) => (
@@ -60,19 +60,19 @@ export function ShikshaVisualizer() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col items-center justify-center"
+      className="flex h-full w-full min-h-0 flex-col items-center justify-center"
     >
-      <div className="relative">
+      <div className="relative flex w-full flex-1 min-h-0 items-center justify-center">
         <AgentAudioVisualizerBar
-          size="lg"
+          size="md"
           state="speaking"
           color="#059669" // emerald-600
           barCount={7}
           audioTrack={micTrackRef}
-          className="relative z-10 size-[200px] md:size-[280px]"
+          className="relative z-10 h-full w-full max-h-[140px] max-w-[140px]"
         />
       </div>
-      <div className="mt-6 flex items-center gap-2">
+      <div className="mt-3 flex shrink-0 items-center gap-2">
         {/* Mic pulse indicator */}
         <span className="relative flex size-3">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-75" />

@@ -1,8 +1,8 @@
 'use client';
 
-import { ShikshaView } from '@/components/app/shiksha-view';
-import type { AppConfig } from '@/app-config';
 import { useSessionContext } from '@livekit/components-react';
+import type { AppConfig } from '@/app-config';
+import { ShikshaView } from '@/components/app/shiksha-view';
 
 interface ViewControllerProps {
   appConfig: AppConfig;
@@ -11,10 +11,5 @@ interface ViewControllerProps {
 export function ViewController({ appConfig }: ViewControllerProps) {
   const { start } = useSessionContext();
 
-  return (
-    <ShikshaView
-      startButtonText={appConfig.startButtonText}
-      onStartCall={start}
-    />
-  );
+  return <ShikshaView startButtonText={appConfig.startButtonText} onStartCall={start} />;
 }

@@ -75,10 +75,9 @@
 
 @theme inline {
   --font-sans:
-    var(--font-nunito), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif:
-    var(--font-lora), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    var(--font-inter), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     var(--font-commit-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
@@ -123,4 +122,48 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom scrollbar for Live Transcript */
+.transcript-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.transcript-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.transcript-scroll::-webkit-scrollbar-thumb {
+  background-color: #d6d3d1; /* stone-300 */
+  border-radius: 20px;
+}
+.dark .transcript-scroll::-webkit-scrollbar-thumb {
+  background-color: #44403c; /* stone-700 */
+}
+
+/* Premium Theme Utilities */
+.bg-mesh {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 40% 20%, hsla(258, 100%, 74%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.15) 0px, transparent 50%);
+}
+
+.dark .bg-mesh {
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(at 40% 20%, hsla(258, 100%, 74%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.15) 0px, transparent 50%);
+}
+
+.glass-panel {
+  @apply border border-white/40 bg-white/70 shadow-2xl backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/70;
+}
+
+.premium-button {
+  @apply border border-indigo-500/20 bg-gradient-to-r from-indigo-600 to-violet-600 font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:shadow-indigo-500/50;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400;
 }

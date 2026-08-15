@@ -1,9 +1,9 @@
 import React from 'react';
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import Link from 'next/link';
-import { ArrowLeft, Phone, CheckCircle2, AlertCircle, BarChart3, PieChart, Users } from 'lucide-react';
 import { unstable_noStore as noStore } from 'next/cache';
+import Link from 'next/link';
+import { AlertCircle, BarChart3, CheckCircle2, Phone, PieChart, Users } from 'lucide-react';
+import path from 'path';
+import sqlite3 from 'sqlite3';
 import { AutoRefresh, ManualRefreshButton } from './auto-refresh';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +11,7 @@ export const revalidate = 0;
 
 async function getCallStats() {
   const dbPath = path.resolve(process.cwd(), '../backend/shiksha.db');
-  
+
   return new Promise<{ total: number; successful: number; failed: number }>((resolve) => {
     const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
       if (err) {
@@ -33,7 +33,7 @@ async function getCallStats() {
         resolve({
           total: successful + failed,
           successful,
-          failed
+          failed,
         });
       }
       db.close();
@@ -42,164 +42,156 @@ async function getCallStats() {
 }
 
 export default async function DashboardPage() {
-  noStore(); // Completely disables all Next.js caching for this page
+  noStore();
   const stats = await getCallStats();
-
-  // Calculate percentages safely
   const successRate = stats.total > 0 ? Math.round((stats.successful / stats.total) * 100) : 0;
   const failRate = stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0;
 
   return (
     <>
-      {/* Silently refreshes the server component every 1 second (1000ms) for instant updates */}
       <AutoRefresh intervalMs={1000} />
-      
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
-      
-      {/* Top Navigation Bar */}
-      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <a href="/" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
-            <ArrowLeft className="w-5 h-5" />
-          </a>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-inner">
-              <BarChart3 className="w-4 h-4 text-white" />
+
+      <div className="flex min-h-screen flex-col pt-8 font-sans text-slate-900 dark:text-slate-100">
+        <main className="mx-auto w-full max-w-7xl p-6 md:p-8 lg:p-12">
+          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <h2 className="mb-2 font-serif text-4xl font-extrabold text-slate-800 dark:text-slate-100">
+                Shiksha Analytics
+              </h2>
+              <p className="text-lg text-slate-500 dark:text-slate-400">
+                Track engagement and conversational outcomes in real-time.
+              </p>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Analytics Dashboard</h1>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <ManualRefreshButton />
-          
-          <div className="px-3 py-1.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold uppercase tracking-wider flex items-center gap-2 border border-green-200 dark:border-green-800/50">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Live Data
-          </div>
-        </div>
-      </nav>
 
-      <main className="max-w-7xl mx-auto p-6 md:p-8 lg:p-12">
-        
-        <div className="mb-10">
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mb-2">Overview</h2>
-          <p className="text-slate-500 dark:text-slate-400">Track user engagement and session outcomes across all your calls.</p>
-        </div>
-
-        {/* BENTO GRID LAYOUT */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(180px,auto)]">
-          
-          {/* Main Total Metric - Large Span */}
-          <div className="md:col-span-4 row-span-2 bg-indigo-600 dark:bg-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200/50 dark:shadow-none flex flex-col justify-between relative overflow-hidden group">
-            {/* Decorative background circle */}
-            <div className="absolute -right-10 -top-10 w-48 h-48 bg-indigo-500 dark:bg-indigo-600 rounded-full blur-2xl opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
-            
-            <div className="relative z-10">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 rounded-full border border-stone-200/50 bg-white/50 px-4 py-2 shadow-sm backdrop-blur-md dark:border-slate-800/50 dark:bg-slate-900/50">
+              <ManualRefreshButton />
+              <div className="mx-1 h-6 w-[1px] bg-stone-300 dark:bg-stone-700"></div>
+              <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
+                <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                Live Connection
               </div>
-              <h3 className="text-indigo-100 font-semibold text-lg mb-1">Total Call Volume</h3>
-              <p className="text-7xl font-black tracking-tighter drop-shadow-sm">{stats.total}</p>
             </div>
-            
-            <div className="relative z-10 mt-8 pt-6 border-t border-indigo-400/30">
-              <p className="text-indigo-100 text-sm">
-                Total number of connections established.
+          </div>
+
+          <div className="grid auto-rows-[minmax(180px,auto)] grid-cols-1 gap-6 md:grid-cols-12">
+            <div className="group relative row-span-2 flex flex-col justify-between overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-500 to-violet-600 p-8 text-white shadow-xl shadow-indigo-500/20 md:col-span-4">
+              <div className="absolute -top-10 -right-10 h-64 w-64 rounded-full bg-white opacity-10 blur-3xl transition-transform duration-700 group-hover:scale-125"></div>
+              <div className="relative z-10">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="mb-1 text-lg font-semibold text-indigo-100">Total Call Volume</h3>
+                <p className="text-7xl font-black tracking-tighter drop-shadow-sm">{stats.total}</p>
+              </div>
+              <div className="relative z-10 mt-8 border-t border-white/20 pt-6">
+                <p className="text-sm font-medium text-indigo-100">
+                  Total number of sessions established.
+                </p>
+              </div>
+            </div>
+
+            <div className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-400 to-emerald-600 p-8 text-white shadow-xl shadow-emerald-500/20 md:col-span-4">
+              <div className="absolute -right-6 -bottom-6 h-48 w-48 rounded-full bg-white opacity-10 blur-2xl transition-transform duration-500 group-hover:scale-125"></div>
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <h3 className="mb-1 text-lg font-semibold text-emerald-50">Successful</h3>
+                  <p className="text-6xl font-black tracking-tighter drop-shadow-sm">
+                    {stats.successful}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
+                  <CheckCircle2 className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="relative z-10 mt-6 flex items-center gap-3">
+                <span className="rounded-xl bg-white px-3 py-1.5 text-sm font-black text-emerald-600 shadow-sm">
+                  {successRate}%
+                </span>
+                <span className="text-sm font-bold tracking-wide text-emerald-50 uppercase">
+                  Completion Rate
+                </span>
+              </div>
+            </div>
+
+            <div className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-gradient-to-br from-rose-400 to-rose-600 p-8 text-white shadow-xl shadow-rose-500/20 md:col-span-4">
+              <div className="absolute -top-6 -left-6 h-48 w-48 rotate-45 bg-white opacity-10 blur-2xl transition-transform duration-700 group-hover:rotate-90"></div>
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <h3 className="mb-1 text-lg font-semibold text-rose-50">Incomplete</h3>
+                  <p className="text-6xl font-black tracking-tighter drop-shadow-sm">
+                    {stats.failed}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
+                  <AlertCircle className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="relative z-10 mt-6 flex items-center gap-3">
+                <span className="rounded-xl bg-white px-3 py-1.5 text-sm font-black text-rose-600 shadow-sm">
+                  {failRate}%
+                </span>
+                <span className="text-sm font-bold tracking-wide text-rose-50 uppercase">
+                  Drop-off Rate
+                </span>
+              </div>
+            </div>
+
+            <div className="glass-panel flex flex-col rounded-[2rem] p-8 md:col-span-8">
+              <div className="mb-10 flex items-center justify-between">
+                <h3 className="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  Outcome Distribution
+                </h3>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300">
+                  <PieChart className="h-6 w-6" />
+                </div>
+              </div>
+              <div className="flex flex-1 flex-col justify-center">
+                <div className="mb-6 flex h-8 w-full overflow-hidden rounded-full bg-slate-200 shadow-inner dark:bg-slate-800">
+                  <div
+                    style={{ width: `${successRate}%` }}
+                    className="h-full bg-emerald-500 transition-all duration-1000 ease-out"
+                  ></div>
+                  <div
+                    style={{ width: `${failRate}%` }}
+                    className="h-full bg-rose-500 transition-all duration-1000 ease-out"
+                  ></div>
+                </div>
+                <div className="flex items-center justify-between text-base font-semibold">
+                  <div className="flex items-center gap-3">
+                    <div className="h-4 w-4 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></div>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      Exercises Completed ({stats.successful})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-4 w-4 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></div>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      Did not finish ({stats.failed})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-start gap-5 rounded-[2rem] border border-amber-200/60 bg-amber-50/80 p-8 shadow-sm backdrop-blur-sm dark:border-amber-800/40 dark:bg-amber-950/40">
+            <div className="shrink-0 rounded-2xl bg-amber-200/50 p-4 shadow-inner dark:bg-amber-900/50">
+              <Phone className="h-7 w-7 text-amber-700 dark:text-amber-400" />
+            </div>
+            <div>
+              <h4 className="mb-2 font-serif text-xl font-bold text-amber-900 dark:text-amber-200">
+                Privacy First Analytics
+              </h4>
+              <p className="leading-relaxed font-medium text-amber-800/90 dark:text-amber-400/80">
+                This dashboard provides operational insights strictly through aggregated data.
+                Personal Identifiable Information (PII), conversational transcripts, and user
+                accounts are entirely excluded from this view to ensure strict data privacy
+                compliance.
               </p>
             </div>
           </div>
-
-          {/* Successful Calls Metric */}
-          <div className="md:col-span-4 bg-emerald-500 dark:bg-emerald-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-200/50 dark:shadow-none flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-400 dark:bg-emerald-500 rounded-full opacity-50 group-hover:scale-125 transition-transform duration-500"></div>
-            
-            <div className="relative z-10 flex justify-between items-start">
-              <div>
-                <h3 className="text-emerald-50 font-semibold text-lg mb-1">Successful</h3>
-                <p className="text-5xl font-black tracking-tighter drop-shadow-sm">{stats.successful}</p>
-              </div>
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            
-            <div className="relative z-10 mt-4 flex items-center gap-2">
-              <span className="bg-white text-emerald-600 text-xs font-black px-2 py-1 rounded-md">
-                {successRate}%
-              </span>
-              <span className="text-emerald-100 text-sm font-medium">Completion Rate</span>
-            </div>
-          </div>
-
-          {/* Failed Calls Metric */}
-          <div className="md:col-span-4 bg-rose-500 dark:bg-rose-600 rounded-3xl p-8 text-white shadow-xl shadow-rose-200/50 dark:shadow-none flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute -left-6 -top-6 w-32 h-32 bg-rose-400 dark:bg-rose-500 rotate-45 opacity-50 group-hover:rotate-90 transition-transform duration-700"></div>
-            
-            <div className="relative z-10 flex justify-between items-start">
-              <div>
-                <h3 className="text-rose-50 font-semibold text-lg mb-1">Incomplete</h3>
-                <p className="text-5xl font-black tracking-tighter drop-shadow-sm">{stats.failed}</p>
-              </div>
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            
-            <div className="relative z-10 mt-4 flex items-center gap-2">
-              <span className="bg-white text-rose-600 text-xs font-black px-2 py-1 rounded-md">
-                {failRate}%
-              </span>
-              <span className="text-rose-100 text-sm font-medium">Drop-off Rate</span>
-            </div>
-          </div>
-
-          {/* Breakdown Chart / Visual Placeholder */}
-          <div className="md:col-span-8 bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-xl">Outcome Distribution</h3>
-              <div className="w-10 h-10 bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 rounded-xl flex items-center justify-center">
-                <PieChart className="w-5 h-5" />
-              </div>
-            </div>
-            
-            <div className="flex-1 flex flex-col justify-center">
-              {/* Colorful Progress Bar representing distribution */}
-              <div className="h-6 w-full rounded-full bg-slate-100 dark:bg-slate-800 flex overflow-hidden mb-4">
-                <div style={{ width: `${successRate}%` }} className="bg-emerald-500 h-full transition-all duration-1000 ease-out"></div>
-                <div style={{ width: `${failRate}%` }} className="bg-rose-500 h-full transition-all duration-1000 ease-out"></div>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm font-medium">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                  <span className="text-slate-600 dark:text-slate-300">Exercises Completed ({stats.successful})</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-                  <span className="text-slate-600 dark:text-slate-300">Did not finish ({stats.failed})</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Privacy Notice inside a creative solid block */}
-        <div className="mt-8 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-2xl p-6 flex items-start gap-4 shadow-sm">
-          <div className="p-3 bg-amber-100 dark:bg-amber-900/50 rounded-xl shrink-0">
-            <Phone className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div>
-            <h4 className="font-bold text-amber-900 dark:text-amber-200 text-lg">Privacy First Analytics</h4>
-            <p className="text-amber-700 dark:text-amber-400/80 mt-1 leading-relaxed">
-              This dashboard provides operational insights strictly through aggregated data. Personal Identifiable Information (PII), conversational transcripts, and user accounts are entirely excluded from this view to ensure strict data privacy compliance.
-            </p>
-          </div>
-        </div>
-
-      </main>
-    </div>
+        </main>
+      </div>
     </>
   );
 }
